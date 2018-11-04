@@ -8,6 +8,8 @@ namespace JwtAuthAPiCore.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
+        public DbSet<MapData> MapData { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
