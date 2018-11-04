@@ -53,41 +53,6 @@ namespace JwtAuthAPiCore.Controllers
             return Ok(mapData);
         }
 
-        // PUT: api/MapData/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutMapData([FromRoute] int id, [FromBody] MapData mapData)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != mapData.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(mapData).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MapDataExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
         // POST: api/MapData
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -107,26 +72,6 @@ namespace JwtAuthAPiCore.Controllers
             return CreatedAtAction("GetMapData", new { id = mapData.Id }, mapData);
         }
 
-        // DELETE: api/MapData/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMapData([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var mapData = await _context.MapData.FindAsync(id);
-            if (mapData == null)
-            {
-                return NotFound();
-            }
-
-            _context.MapData.Remove(mapData);
-            await _context.SaveChangesAsync();
-
-            return Ok(mapData);
-        }
 
         private bool MapDataExists(int id)
         {
