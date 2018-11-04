@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using JwtAuthAPiCore.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -19,16 +20,19 @@ namespace JwtAuthAPiCore.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _Context;
 
         public AccountController(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            IConfiguration configuration
+            IConfiguration configuration,
+            ApplicationDbContext _context
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _Context = _context;
         }
 
         [HttpPost]
@@ -54,6 +58,8 @@ namespace JwtAuthAPiCore.Controllers
                 Email = model.Email
             };
             var result = await _userManager.CreateAsync(user, model.Password);
+            _Context.UpdateTracker.Add(new UpdateTracker { UserId = user.Id, LastUpdatedId = 0 });
+            _Context.SaveChanges();
 
             if (result.Succeeded)
             {
