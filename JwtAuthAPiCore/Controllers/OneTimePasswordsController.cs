@@ -10,6 +10,8 @@ using JwtAuthAPiCore.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
+using Microsoft.Extensions.Configuration;
+using JwtAuthAPiCore.Utils;
 
 namespace JwtAuthAPiCore.Controllers
 {
@@ -18,13 +20,17 @@ namespace JwtAuthAPiCore.Controllers
     public class OneTimePasswordsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly TokenGenerator _tokenGenerator;
 
-        public OneTimePasswordsController(ApplicationDbContext context)
+        public OneTimePasswordsController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+            _tokenGenerator = new TokenGenerator(_configuration);
         }
 
-        // GET: api/OneTimePasswords
+        // POST: api/OneTimePasswords
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
         public IActionResult GetOneTimePassword([FromBody] MobileUser mobileUser)
@@ -42,6 +48,36 @@ namespace JwtAuthAPiCore.Controllers
             _context.OneTimePasswords.Add(oneTimePassword);
 
             return Ok(oneTimePassword.Password);
+        }
+
+        // POST: api/OneTimePasswords/consume
+        [HttpPost("consume/{password}")]
+        public async Task<IActionResult> GetOneTimePassword(string password)
+        {
+            var oneTimePassword = await _context.OneTimePasswords.SingleOrDefaultAsync(p => p.Password.Equals(password));
+
+            if (oneTimePassword == null)
+            {
+                return BadRequest("One Time Password not found");
+            }
+            else if (DateTime.Now > oneTimePassword.Expires)
+            {
+                return BadRequest("Password expired");
+            }
+            else if (oneTimePassword.IsConsumed)
+            {
+                return BadRequest("Password already used");
+            }
+
+            var identityUser = oneTimePassword.MobileUser.User;
+            var token = _tokenGenerator.GenerateJwtToken(identityUser.UserName, identityUser);
+
+            var jwtToken = new JwtToken(token, oneTimePassword.MobileUser);
+
+            await _context.JwtTokens.AddAsync(jwtToken);
+            await _context.SaveChangesAsync();
+
+            return Ok(token);
         }
 
         private bool OneTimePasswordExists(string id)
