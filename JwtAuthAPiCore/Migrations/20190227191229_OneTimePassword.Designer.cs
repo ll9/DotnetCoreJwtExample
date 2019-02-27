@@ -3,36 +3,20 @@ using System;
 using JwtAuthAPiCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace JwtAuthAPiCore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190227191229_OneTimePassword")]
+    partial class OneTimePassword
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.1.8-servicing-32085");
-
-            modelBuilder.Entity("JwtAuthAPiCore.Models.JwtToken", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("MobileUserId");
-
-                    b.Property<bool>("Revoked");
-
-                    b.Property<string>("Token");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MobileUserId");
-
-                    b.ToTable("JwtTokens");
-                });
 
             modelBuilder.Entity("JwtAuthAPiCore.Models.MobileUser", b =>
                 {
@@ -230,13 +214,6 @@ namespace JwtAuthAPiCore.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("JwtAuthAPiCore.Models.JwtToken", b =>
-                {
-                    b.HasOne("JwtAuthAPiCore.Models.MobileUser", "MobileUser")
-                        .WithMany()
-                        .HasForeignKey("MobileUserId");
                 });
 
             modelBuilder.Entity("JwtAuthAPiCore.Models.MobileUser", b =>

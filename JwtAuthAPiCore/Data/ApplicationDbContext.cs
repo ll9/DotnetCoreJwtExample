@@ -10,6 +10,8 @@ namespace JwtAuthAPiCore.Data
     public class ApplicationDbContext : IdentityDbContext
     {
         public DbSet<MobileUser> MobileUsers { get; set; }
+        public DbSet<OneTimePassword> OneTimePasswords { get; set; }
+        public DbSet<JwtToken> JwtTokens { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
