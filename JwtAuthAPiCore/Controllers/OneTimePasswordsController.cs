@@ -44,8 +44,9 @@ namespace JwtAuthAPiCore.Controllers
 
             } while (_context.OneTimePasswords.Any(p => p.Password.Equals(password)));
 
-            var oneTimePassword = new OneTimePassword(password, mobileUser);
+            var oneTimePassword = new OneTimePassword(password, mobileUser.Id);
             _context.OneTimePasswords.Add(oneTimePassword);
+            _context.SaveChanges();
 
             return Ok(oneTimePassword.Password);
         }
@@ -54,7 +55,10 @@ namespace JwtAuthAPiCore.Controllers
         [HttpPost("consume/{password}")]
         public async Task<IActionResult> GetOneTimePassword(string password)
         {
-            var oneTimePassword = await _context.OneTimePasswords.SingleOrDefaultAsync(p => p.Password.Equals(password));
+            var oneTimePassword = await _context.OneTimePasswords
+                .Include(p => p.MobileUser)
+                .ThenInclude(m => m.User)
+                .SingleOrDefaultAsync(p => p.Password.Equals(password));
 
             if (oneTimePassword == null)
             {
@@ -73,6 +77,7 @@ namespace JwtAuthAPiCore.Controllers
             var token = _tokenGenerator.GenerateJwtToken(identityUser.UserName, identityUser);
 
             var jwtToken = new JwtToken(token, oneTimePassword.MobileUser);
+            oneTimePassword.IsConsumed = true;
 
             await _context.JwtTokens.AddAsync(jwtToken);
             await _context.SaveChangesAsync();

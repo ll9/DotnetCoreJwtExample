@@ -9,8 +9,19 @@ namespace JwtAuthAPiCore.Models
 {
     public class MobileUser
     {
+        public MobileUser()
+        {
+
+        }
+
+        public MobileUser(string name, string identityUserId)
+        {
+            Name = name;
+            IdentityUserId = identityUserId;
+        }
+
         [Key]
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; }
 
         public string IdentityUserId { get; set; }

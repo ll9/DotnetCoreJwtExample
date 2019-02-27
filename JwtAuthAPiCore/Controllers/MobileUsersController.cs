@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using JwtAuthAPiCore.Data;
 using JwtAuthAPiCore.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
 
 namespace JwtAuthAPiCore.Controllers
 {
@@ -83,13 +86,18 @@ namespace JwtAuthAPiCore.Controllers
         }
 
         // POST: api/MobileUsers
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
-        public async Task<IActionResult> PostMobileUser([FromBody] MobileUser mobileUser)
+        public async Task<IActionResult> PostMobileUser([FromBody] string name)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var mobileUser = new MobileUser(name, userId);
+
 
             _context.MobileUsers.Add(mobileUser);
             await _context.SaveChangesAsync();

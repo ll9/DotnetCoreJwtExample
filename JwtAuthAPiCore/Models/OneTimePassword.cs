@@ -14,10 +14,10 @@ namespace JwtAuthAPiCore.Models
 
         }
 
-        public OneTimePassword(string password, MobileUser mobileUser)
+        public OneTimePassword(string password, string mobileUserId)
         {
             Password = password;
-            MobileUser = mobileUser;
+            MobileUserId = mobileUserId;
         }
 
         [Key]
