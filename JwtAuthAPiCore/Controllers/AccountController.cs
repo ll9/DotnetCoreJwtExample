@@ -58,7 +58,6 @@ namespace JwtAuthAPiCore.Controllers
                 Email = model.Email
             };
             var result = await _userManager.CreateAsync(user, model.Password);
-            _Context.UpdateTracker.Add(new UpdateTracker { UserId = user.Id, LastUpdatedId = 0 });
             _Context.SaveChanges();
 
             if (result.Succeeded)

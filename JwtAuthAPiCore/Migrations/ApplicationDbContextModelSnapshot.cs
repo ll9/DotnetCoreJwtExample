@@ -4,16 +4,14 @@ using JwtAuthAPiCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace JwtAuthAPiCore.Data.Migrations
+namespace JwtAuthAPiCore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181104135500_UpdateTracker")]
-    partial class UpdateTracker
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,38 +19,22 @@ namespace JwtAuthAPiCore.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("JwtAuthAPiCore.Data.MapData", b =>
+            modelBuilder.Entity("JwtAuthAPiCore.Models.MobileUser", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("HouseNumber");
+                    b.Property<string>("IdentityUserId");
 
-                    b.Property<string>("Location");
-
-                    b.Property<string>("Street");
-
-                    b.Property<string>("UserId");
+                    b.Property<string>("Name");
 
                     b.HasKey("Id");
 
-                    b.ToTable("MapData");
-                });
+                    b.HasIndex("IdentityUserId", "Name")
+                        .IsUnique()
+                        .HasFilter("[IdentityUserId] IS NOT NULL AND [Name] IS NOT NULL");
 
-            modelBuilder.Entity("JwtAuthAPiCore.Data.UpdateTracker", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("LastUpdatedId");
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UpdateTracker");
+                    b.ToTable("MobileUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -218,6 +200,13 @@ namespace JwtAuthAPiCore.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("JwtAuthAPiCore.Models.MobileUser", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("IdentityUserId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
