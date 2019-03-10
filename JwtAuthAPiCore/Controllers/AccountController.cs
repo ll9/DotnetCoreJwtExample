@@ -46,7 +46,9 @@ namespace JwtAuthAPiCore.Controllers
                 return GenerateJwtToken(model.Email, appUser);
             }
 
-            throw new ApplicationException("INVALID_LOGIN_ATTEMPT");
+            var errorMessage = "Login Fehlgeschlagen. Prüfen Sie Nutzername und Passwort.";
+
+            return StatusCode(409, errorMessage);
         }
 
         [HttpPost]
@@ -66,7 +68,11 @@ namespace JwtAuthAPiCore.Controllers
                 return GenerateJwtToken(model.Email, user);
             }
 
-            throw new ApplicationException("UNKNOWN_ERROR");
+            var errorMessage = result.Errors
+                .Select(e => $"{e.Code}: {e.Description}")
+                .Aggregate((current, next) => $"{current}\n{next}");
+
+            return StatusCode(409, errorMessage);
         }
 
         private string GenerateJwtToken(string email, IdentityUser user)
