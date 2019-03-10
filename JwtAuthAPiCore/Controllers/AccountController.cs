@@ -43,7 +43,7 @@ namespace JwtAuthAPiCore.Controllers
             if (result.Succeeded)
             {
                 var appUser = _userManager.Users.SingleOrDefault(r => r.Email == model.Email);
-                return await GenerateJwtToken(model.Email, appUser);
+                return GenerateJwtToken(model.Email, appUser);
             }
 
             throw new ApplicationException("INVALID_LOGIN_ATTEMPT");
@@ -58,19 +58,18 @@ namespace JwtAuthAPiCore.Controllers
                 Email = model.Email
             };
             var result = await _userManager.CreateAsync(user, model.Password);
-            _Context.UpdateTracker.Add(new UpdateTracker { UserId = user.Id, LastUpdatedId = 0 });
             _Context.SaveChanges();
 
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, false);
-                return await GenerateJwtToken(model.Email, user);
+                return GenerateJwtToken(model.Email, user);
             }
 
             throw new ApplicationException("UNKNOWN_ERROR");
         }
 
-        private async Task<object> GenerateJwtToken(string email, IdentityUser user)
+        private string GenerateJwtToken(string email, IdentityUser user)
         {
             var claims = new List<Claim>
             {
